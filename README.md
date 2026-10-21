@@ -161,6 +161,71 @@ Loaded songs: 18
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
 
+## Recommendations by Profile
+
+Condensed terminal output of `python src/main.py` (title, genre/mood, score out of 6.00).
+
+### Standard profiles (top 5)
+
+```
+High-Energy Pop  {'genre': 'pop', 'mood': 'happy', 'energy': 0.9, 'valence': 0.8, 'acousticness': 0.1}
+  1. Sunrise City (pop/happy) 5.56
+  2. Rooftop Lights (indie pop/happy) 4.41
+  3. Gym Hero (pop/intense) 3.66
+  4. Neon Overdrive (edm/euphoric) 2.56
+  5. Storm Runner (rock/intense) 2.50
+
+Chill Lofi  {'genre': 'lofi', 'mood': 'chill', 'energy': 0.38, 'valence': 0.58, 'acousticness': 0.8}
+  1. Library Rain (lofi/chill) 5.66
+  2. Midnight Coding (lofi/chill) 5.63
+  3. Spacewalk Thoughts (ambient/chill) 4.49
+  4. Focus Flow (lofi/focused) 3.70
+  5. Coffee Shop Stories (jazz/relaxed) 2.59
+
+Deep Intense Rock  {'genre': 'rock', 'mood': 'intense', 'energy': 0.92, 'valence': 0.45, 'acousticness': 0.1}
+  1. Storm Runner (rock/intense) 5.71
+  2. Gym Hero (pop/intense) 4.47
+  3. Iron Verdict (metal/angry) 2.50
+  4. Night Drive Loop (synthwave/moody) 2.40
+  5. Concrete Crown (hip hop/confident) 2.40
+
+Conflicted Listener  {'genre': 'classical', 'mood': 'angry', 'energy': 0.95, 'valence': 0.25, 'acousticness': 0.9}
+  1. Iron Verdict (metal/angry) 4.29
+  2. Rainfall Sonata (classical/melancholic) 2.54
+  3. Storm Runner (rock/intense) 2.12
+  4. Night Drive Loop (synthwave/moody) 1.93
+  5. Gym Hero (pop/intense) 1.91
+```
+
+### Selected adversarial profiles (top 3)
+
+```
+Sad but high-energy  {'genre': 'pop', 'mood': 'sad', 'energy': 0.9}
+  1. Empty Chair Blues (blues/sad) 2.65
+  2. Gym Hero (pop/intense) 2.46
+  3. Sunrise City (pop/happy) 2.38
+
+Wrong case  {'genre': 'Pop', 'mood': 'Happy', 'energy': 0.8}
+  1. Sunrise City (pop/happy) 1.47
+  2. Concrete Crown (hip hop/confident) 1.47
+  3. Rooftop Lights (indie pop/happy) 1.44
+
+Energy out of range  {'genre': 'pop', 'mood': 'happy', 'energy': 5.0}
+  1. Sunrise City (pop/happy) -1.77
+  2. Rooftop Lights (indie pop/happy) -2.86
+  3. Gym Hero (pop/intense) -3.61
+
+Empty profile  {}
+  1. Sunrise City (pop/happy) 0.00
+  2. Midnight Coding (lofi/chill) 0.00
+  3. Storm Runner (rock/intense) 0.00
+
+Energy as string  {'genre': 'pop', 'mood': 'happy', 'energy': '0.9'}
+  CRASHED: TypeError: unsupported operand type(s) for -: 'float' and 'str'
+```
+
+Takeaways: mood (2.0) outweighs genre (1.0), unmatched labels silently drop out, out-of-range energy gives negative scores, and a string energy crashes the scorer.
+
 ---
 
 ## Experiments You Tried
