@@ -9,7 +9,11 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+import argparse
+
+from tabulate import tabulate
+
+from recommender import SCORING_MODES, load_songs, max_score, recommend_songs
 
 # Distinct user taste profiles for testing the recommender.
 PROFILES = {
@@ -33,6 +37,16 @@ PROFILES = {
         "energy": 0.92,
         "valence": 0.45,
         "acousticness": 0.1,
+    },
+    # Uses the advanced song features (mood tag, decade, popularity, ...).
+    "Nostalgic Throwback": {
+        "genre": "synthwave",
+        "mood": "moody",
+        "mood_tag": "nostalgic",
+        "energy": 0.7,
+        "popularity": 60,
+        "release_decade": 1980,
+        "instrumentalness": 0.7,
     },
     # Edge case: the labels and the numbers pull in opposite directions.
     "Conflicted Listener": {
@@ -63,8 +77,15 @@ ADVERSARIAL_PROFILES = {
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Music Recommender Simulation")
+    parser.add_argument("--mode", choices=SCORING_MODES, default="balanced",
+                        help="scoring mode (default: balanced)")
+    mode = parser.parse_args().mode
+    weights = SCORING_MODES[mode]
+
     songs = load_songs("data/songs.csv")
     print(f"Loaded songs: {len(songs)}")
+    print(f"Scoring mode: {mode}")
 
     line = "=" * 60
     for group, profiles in (("STANDARD", PROFILES), ("ADVERSARIAL", ADVERSARIAL_PROFILES)):
@@ -75,15 +96,22 @@ def main() -> None:
             print(f"  Profile: {user_prefs}")
             print(line)
             try:
-                recommendations = recommend_songs(user_prefs, songs, k=5)
+                recommendations = recommend_songs(user_prefs, songs, k=5, weights=weights)
             except Exception as exc:  # adversarial input may crash the scorer
                 print(f"  CRASHED: {type(exc).__name__}: {exc}")
                 continue
-            for rank, (song, score, explanation) in enumerate(recommendations, start=1):
-                print(f"\n{rank}. {song['title']} by {song['artist']} "
-                      f"[{song['genre']}/{song['mood']}, energy {song['energy']}]")
-                print(f"   Score: {score:.2f} / 6.00")
-                print(f"   Reasons: {explanation or 'no matching features'}")
+            top = max_score(user_prefs, weights)
+            rows = [
+                [rank, song["title"], song["artist"], f"{score:.2f} / {top:.2f}",
+                 explanation or "no matching features"]
+                for rank, (song, score, explanation) in enumerate(recommendations, start=1)
+            ]
+            print(tabulate(
+                rows,
+                headers=["#", "Title", "Artist", "Score", "Reasons"],
+                tablefmt="grid",
+                maxcolwidths=[None, 22, 16, None, 60],
+            ))
 
 
 if __name__ == "__main__":
